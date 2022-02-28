@@ -75,6 +75,7 @@ void MainWindow::on_actionCompile_triggered()
     ASTModel = new QJsonModel;
     ui->newSolASTContainer->setModel(ASTModel);
     ASTModel->load("tmp2.solast");
+    selectedNodesRoot = new QJsonTreeItem();
 
 }
 
@@ -159,8 +160,20 @@ void MainWindow::on_pushButton_2_clicked()
 {
     //Using QJsonTreeModel
     QModelIndex index = ui->newSolASTContainer->currentIndex();
-    QVariant data = index.model()->data(index);
+    QJsonTreeItem* data = ASTModel->treeData(index);
+    QList<QJsonTreeItem*> pathToRoot = QList<QJsonTreeItem*>();
+    QJsonTreeItem* currentNode = data;
+    while(currentNode != nullptr){
+        pathToRoot.append(currentNode);
+        currentNode = currentNode->parent();
+    }
+    QString pathText = "";
+    for(int i = 0; i< pathToRoot.length();i++){
+        pathText.append(pathToRoot[i]->key()).append(", ");
+    }
+    ui->textEdit->setText(pathText);
 
-    ui->textEdit->setText(data.toString());
+
+//    ui->textEdit->setText(data->key().append(", ").append(data->value().toString()).append(", ").append(data->value().typeName()));
 }
 

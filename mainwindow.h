@@ -41,6 +41,7 @@ private:
     Ui::MainWindow *ui;
     QString currentFile = "";
     QJsonModel* ASTModel;
+    QJsonTreeItem* selectedNodesRoot = new QJsonTreeItem();
 
 };
 #endif // MAINWINDOW_H
