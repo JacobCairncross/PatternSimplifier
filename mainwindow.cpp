@@ -167,13 +167,24 @@ void MainWindow::on_pushButton_2_clicked()
         pathToRoot.append(currentNode);
         currentNode = currentNode->parent();
     }
+
+    for(int i = pathToRoot.length()-2; i >= 0; i++){ //TODO: Add a check here to ensure this wont cause an out of bounds exception
+        QJsonTreeItem* newNode = pathToRoot[i]->getChildlessCopy(selectedNodesRoot);
+        newNode->parent()->appendChild(newNode);
+    }
+    //BEGIN Test code
     QString pathText = "";
-    for(int i = 0; i< pathToRoot.length();i++){
-        pathText.append(pathToRoot[i]->key()).append(", ");
+//    for(int i = 0; i< pathToRoot.length();i++){
+//        pathText.append(pathToRoot[i]->key()).append(", ");
+//    }
+    QJsonTreeItem* currentNodeInSelectedTree = selectedNodesRoot;
+    while(currentNodeInSelectedTree->childCount() > 0){
+        pathText.append(currentNodeInSelectedTree->child(0)->key());
+        currentNodeInSelectedTree = currentNodeInSelectedTree->child(0);
     }
     ui->textEdit->setText(pathText);
+    //END Test code
 
 
-//    ui->textEdit->setText(data->key().append(", ").append(data->value().toString()).append(", ").append(data->value().typeName()));
 }
 
