@@ -77,6 +77,7 @@ void MainWindow::on_actionCompile_triggered()
     QByteArray cleanedJson = solidityHandler->get_ast();
     ASTModel->loadJson(cleanedJson);
     selectedNodesRoot = new QJsonTreeItem();
+    selectedNodesRoot->setType(QJsonValue::Object);
     ASTModel->setSelectedNodesRoot(selectedNodesRoot);
 
 
@@ -101,24 +102,8 @@ void MainWindow::on_selectNodeButton_clicked()
         lastNode->appendChild(newNode);
         lastNode = newNode;
     }
-    //BEGIN Test code
-    QString pathText = "";
-//    for(int i = 0; i< pathToRoot.length();i++){
-//        pathText.append(pathToRoot[i]->key()).append(", ");
-//    }
-    QJsonTreeItem* currentNodeInSelectedTree = selectedNodesRoot;
-    while(currentNodeInSelectedTree->childCount() > 0){
 
-        pathText.append(currentNodeInSelectedTree->child(0)->key());
-        currentNodeInSelectedTree = currentNodeInSelectedTree->child(0);
-    }
-//    ui->solidityCodeContainer->setText(pathText);
-    QLinearGradient gradient(0,0,width(),0);
-    gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
-
-//    QBrush brush(gradient);
-//    ASTModel->itemData(index).setBackground(Qt::green);
-//    ui->newSolASTContainer->setB
-    //END Test code
+    QJsonValue jsonVal = ASTModel->genJson(selectedNodesRoot);
+    ui->solidityCodeContainer->setText(ASTModel->jsonToByte(jsonVal));
 }
 
