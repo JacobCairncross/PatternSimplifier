@@ -21,8 +21,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void AddRoot(QString name, QJsonValue value);
-    void AddChild(QTreeWidgetItem* parent, QString name, QJsonValue value);
 
 private slots:
     void on_actionNew_triggered();
@@ -34,6 +32,8 @@ private slots:
     void on_actionCompile_triggered();
 
     void on_selectNodeButton_clicked();
+
+    void save_byte_to_file(QByteArray byteArr, QString fileName);
 
 private:
     Ui::MainWindow *ui;

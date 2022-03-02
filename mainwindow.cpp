@@ -42,16 +42,25 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionSave_as_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save as");
+    QByteArray byteText = ui->solidityCodeContainer->toPlainText().toUtf8();
+    save_byte_to_file(byteText, fileName);
+//    QFile file(fileName);
+//    if(!file.open(QFile::WriteOnly | QFile::Text)){
+//        QMessageBox::warning(this, "Warning", "Cannot save file : " + file.errorString());
+//        return;
+//    }
+//    currentFile = fileName;
+//    setWindowTitle(fileName);
+//    QTextStream out(&file);
+//    QString text = ui->solidityCodeContainer->toPlainText();
+//    out << text;
+//    file.close();
+}
+
+void MainWindow::save_byte_to_file(QByteArray byteArr, QString fileName){
     QFile file(fileName);
-    if(!file.open(QFile::WriteOnly | QFile::Text)){
-        QMessageBox::warning(this, "Warning", "Cannot save file : " + file.errorString());
-        return;
-    }
-    currentFile = fileName;
-    setWindowTitle(fileName);
-    QTextStream out(&file);
-    QString text = ui->solidityCodeContainer->toPlainText();
-    out << text;
+    file.open(QIODevice::WriteOnly);
+    file.write(byteArr);
     file.close();
 }
 
@@ -104,6 +113,6 @@ void MainWindow::on_selectNodeButton_clicked()
     }
 
     QJsonValue jsonVal = ASTModel->genJson(selectedNodesRoot);
-    ui->solidityCodeContainer->setText(ASTModel->jsonToByte(jsonVal));
+    save_byte_to_file(ASTModel->jsonToByte(jsonVal), "savedPattern.json");
 }
 
