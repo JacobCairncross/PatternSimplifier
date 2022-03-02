@@ -10,11 +10,13 @@
 #include <QJsonValue>
 #include <QJsonArray>
 
+#include <QMessageBox>
+
 class SolidityHandler
 {
 public:
     SolidityHandler();
     void sol_to_solast(QString filePath);
-    QJsonObject get_ast();
+    QByteArray get_ast();
 };
 #endif // SOLIDITYHANDLER_H

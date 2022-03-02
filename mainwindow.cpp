@@ -7,8 +7,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->solidityASTContainer->setColumnCount(2);
-//Node* root = new Node(NULL, "root", QVariant(QJsonValue()), Node::object);
 }
 
 MainWindow::~MainWindow()
@@ -61,102 +59,31 @@ void MainWindow::on_actionSave_as_triggered()
 void MainWindow::on_actionCompile_triggered()
 {
     //Original way of making tree
-    SolidityHandler* solidityHandler = new SolidityHandler();
-    solidityHandler->sol_to_solast(currentFile);
+//    SolidityHandler* solidityHandler = new SolidityHandler();
+//    solidityHandler->sol_to_solast(currentFile);
 
-    QJsonObject ast = solidityHandler->get_ast();
-    QStringList keys = ast.keys();
-    for(int i=0;i<keys.length();i++){
-        QString currentKey = keys.at(i);
-        AddRoot(currentKey, ast.value(keys.at(i)));
-    }
+//    QJsonObject ast = solidityHandler->get_ast();
+//    QStringList keys = ast.keys();
+//    for(int i=0;i<keys.length();i++){
+//        QString currentKey = keys.at(i);
+//        AddRoot(currentKey, ast.value(keys.at(i)));
+//    }
 
     //Using QJsonTree library
     ASTModel = new QJsonModel;
     ui->newSolASTContainer->setModel(ASTModel);
-    ASTModel->load("tmp2.solast");
+    SolidityHandler* solidityHandler = new SolidityHandler();
+    solidityHandler->sol_to_solast(currentFile);
+    QByteArray cleanedJson = solidityHandler->get_ast();
+    ASTModel->loadJson(cleanedJson);
     selectedNodesRoot = new QJsonTreeItem();
-
-}
-
-void MainWindow::AddRoot(QString name, QJsonValue value){
-    QTreeWidgetItem* item = new QTreeWidgetItem(ui->solidityASTContainer);
-    item->setText(0, name);
-    if(value.isString()){
-        item->setText(1,value.toString());
-    }
-    if(value.isObject()){
-        QJsonObject object = value.toObject();
-        QStringList keys = object.keys();
-        for(int i = 0;i<keys.length();i++){
-            QString currentKey = keys.at(i);
-            AddChild(item, currentKey, object.value(keys.at(i)));
-        }
-    }
-    if(value.isArray()){
-        QJsonArray array = value.toArray();
-        for(int i = 0; i<array.size(); i++){
-            AddChild(item, QStringLiteral("%1").arg(i), array.at(i));
-        }
-    }
-
-    ui->solidityASTContainer->addTopLevelItem(item);
-
-
-}
-void MainWindow::AddChild(QTreeWidgetItem* parent, QString name, QJsonValue value){
-    QTreeWidgetItem* item = new QTreeWidgetItem();
-    item->setText(0, name);
-    if(value.isString()){
-        item->setText(1,value.toString());
-    }
-    else if(value.isDouble()){
-        item->setText(1, QStringLiteral("%1").arg(value.toDouble()));
-    }
-    else if(value.isObject()){
-        QJsonObject object = value.toObject();
-        QStringList keys = object.keys();
-        for(int i = 0;i<keys.length();i++){
-            QString currentKey = keys.at(i);
-            AddChild(item, currentKey, object.value(keys.at(i)));
-        }
-    }
-    else if(value.isArray()){
-        QJsonArray array = value.toArray();
-        for(int i = 0; i<array.size(); i++){
-            AddChild(item, QStringLiteral("%1").arg(i), array.at(i));
-        }
-    }
-    else{
-        item->setText(1, value.toString());
-    }
-
-    parent->addChild(item);
-}
-
-
-void MainWindow::on_pushButton_clicked()
-{
-    QTreeWidgetItem* currentNode = ui->solidityASTContainer->currentItem();
-    QLinearGradient gradient(0,0,width(),0);
-    gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
-
-    QBrush brush(gradient);
-    currentNode->setBackground(1, brush);
-
-//    Node* newNode = new Node(MainWindow::root, currentNode->text(0), currentNode->text(1), Node::literal);
-//    root->children.push_back(newNode);
-//    ui->textEdit->setText("");
-//    for(int i = 0; i<root->children.size();i++){
-//        ui->textEdit->append(root->children.at(i)->getKey() + ", ");
-//    }
-
+    ASTModel->setSelectedNodesRoot(selectedNodesRoot);
 
 
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_selectNodeButton_clicked()
 {
     //Using QJsonTreeModel
     QModelIndex index = ui->newSolASTContainer->currentIndex();
@@ -181,12 +108,17 @@ void MainWindow::on_pushButton_2_clicked()
 //    }
     QJsonTreeItem* currentNodeInSelectedTree = selectedNodesRoot;
     while(currentNodeInSelectedTree->childCount() > 0){
+
         pathText.append(currentNodeInSelectedTree->child(0)->key());
         currentNodeInSelectedTree = currentNodeInSelectedTree->child(0);
     }
-    ui->textEdit->setText(pathText);
+//    ui->solidityCodeContainer->setText(pathText);
+    QLinearGradient gradient(0,0,width(),0);
+    gradient.setColorAt(0, QColor::fromRgbF(0, 1, 0, 1));
+
+//    QBrush brush(gradient);
+//    ASTModel->itemData(index).setBackground(Qt::green);
+//    ui->newSolASTContainer->setB
     //END Test code
-
-
 }
 

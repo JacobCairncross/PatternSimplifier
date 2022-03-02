@@ -25,39 +25,14 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QTextEdit" name="textEdit"/>
+      <widget class="QTextEdit" name="solidityCodeContainer"/>
      </item>
      <item>
       <widget class="QTreeView" name="newSolASTContainer"/>
      </item>
-     <item>
-      <widget class="QTextEdit" name="solidityCodeContainer"/>
-     </item>
-     <item>
-      <widget class="QTreeWidget" name="solidityASTContainer">
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
-      </widget>
-     </item>
     </layout>
    </widget>
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>1900</x>
-      <y>940</y>
-      <width>89</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Select Node</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="selectNodeButton">
     <property name="geometry">
      <rect>
       <x>490</x>
@@ -67,7 +42,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Selectier Node</string>
+     <string>Select Node</string>
     </property>
    </widget>
   </widget>
