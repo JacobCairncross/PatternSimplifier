@@ -104,8 +104,17 @@ void MainWindow::on_selectNodeButton_clicked()
         pathToRoot.append(currentNode);
         currentNode = currentNode->parent();
     }
-    QJsonTreeItem* lastNode = selectedNodesRoot;
-    for(int i = pathToRoot.length()-2; i >= 0; i--){ //TODO: Add a check here to ensure this wont cause an out of bounds exception
+    //Find common ancestor so we can append new path to it
+    QJsonTreeItem* mostCommonAncestor = selectedNodesRoot;
+    int pathToRootIndex = pathToRoot.length()-2;
+    while(mostCommonAncestor->hasChild(pathToRoot[pathToRootIndex]->key())){
+        mostCommonAncestor = mostCommonAncestor->child(pathToRoot[pathToRootIndex]->key());
+        pathToRootIndex--;
+    }
+
+
+    QJsonTreeItem* lastNode = mostCommonAncestor;
+    for(int i = pathToRootIndex; i >= 0; i--){ //TODO: Add a check here to ensure this wont cause an out of bounds exception
         QJsonTreeItem* newNode = pathToRoot[i]->getChildlessCopy(lastNode);
         assert(lastNode == newNode->parent());
         lastNode->appendChild(newNode);
