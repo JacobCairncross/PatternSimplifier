@@ -7,6 +7,7 @@
 #include <QTreeWidget>
 #include "node.h"
 #include "dependencies/QJsonModel/qjsonmodel.h"
+#include "patterntreeitem.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -40,6 +41,7 @@ private:
     QString currentFile = "";
     QJsonModel* ASTModel;
     QJsonTreeItem* selectedNodesRoot = new QJsonTreeItem();
+    PatternTreeItem* patternNodesRoot = new PatternTreeItem();
 
 };
 #endif // MAINWINDOW_H

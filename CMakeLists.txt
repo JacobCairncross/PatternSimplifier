@@ -29,6 +29,10 @@ set(PROJECT_SOURCES
         node.cpp
         dependencies/QJsonModel/qjsonmodel.cpp
         dependencies/QJsonModel/qjsonmodel.h
+        pattern_rule.h
+        pattern_rule.cpp
+        patterntreeitem.h
+        patterntreeitem.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
