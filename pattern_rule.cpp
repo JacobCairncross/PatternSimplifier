@@ -68,6 +68,8 @@ int pattern_rule::index_value(){
 }
 QString pattern_rule::value_to_string(){
     switch(ruleType){
+    case root:
+        return "";
     case pass:
         return "";
     case key:
@@ -122,10 +124,10 @@ void pattern_rule::set_index_value(int value){
 
 QJsonObject* pattern_rule::toJson(){
     QJsonObject* obj = new QJsonObject();
-    obj->insert("rule", QJsonValue(rule_name()));
-    obj->insert("value", QJsonValue(value_to_string()));
+    obj->insert("rule", rule_name());
+    obj->insert("value", value_to_string());
     return obj;
-    QByteArray /*json;
+    /*QByteArray json;
     QByteArray indentAmount = indent ? QByteArray(4 * depth, ' '): "";
 
     //Double indentAmounts are purely for aesthetic purposes
