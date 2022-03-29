@@ -19,7 +19,7 @@ public:
     QString key() const;
     pattern_rule* rule() const;
     //PatternTreeItem* getChildlessCopy(PatternTreeItem* parent) const;
-    QByteArray toJson(int depth = 0, bool indent = false);
+    QJsonObject* toJson();
 
     //static PatternTreeItem* load(const QJsonValue& value, PatternTreeItem * parent = 0);
 

@@ -18,8 +18,10 @@ pattern_rule::RuleType pattern_rule::rule_type(){
   return ruleType;
 }
 
-QByteArray pattern_rule::rule_name(){
+QString pattern_rule::rule_name(){
     switch(ruleType){
+    case root:
+        return "ROOT";
     case pass:
         return "PASS";
     case key:
@@ -64,29 +66,29 @@ int pattern_rule::size_value(){
 int pattern_rule::index_value(){
   return indexValue;
 }
-QByteArray pattern_rule::value_to_string(){
+QString pattern_rule::value_to_string(){
     switch(ruleType){
     case pass:
         return "";
     case key:
-        return keyValue.toUtf8();
+        return keyValue;
     case literalValue:
     {
         if(valueType == QJsonValue::String){
-            return stringValue.toUtf8();
+            return stringValue;
         }
         else if(valueType == QJsonValue::Double){
-            return QVariant(floatValue).toString().toUtf8();
+            return QVariant(floatValue).toString();
         }
         else if(valueType == QJsonValue::Bool){
-            return QVariant(boolValue).toString().toUtf8();
+            return QVariant(boolValue).toString();
         }
     }
         break;
     case index:
-        return QVariant(indexValue).toString().toUtf8();
+        return QVariant(indexValue).toString();
     case size:
-        return QVariant(sizeValue).toString().toUtf8();
+        return QVariant(sizeValue).toString();
     }
 }
 
@@ -118,8 +120,12 @@ void pattern_rule::set_index_value(int value){
   indexValue = value;
 }
 
-QByteArray pattern_rule::toJson(int depth, bool indent){
-    QByteArray json;
+QJsonObject* pattern_rule::toJson(){
+    QJsonObject* obj = new QJsonObject();
+    obj->insert("rule", QJsonValue(rule_name()));
+    obj->insert("value", QJsonValue(value_to_string()));
+    return obj;
+    QByteArray /*json;
     QByteArray indentAmount = indent ? QByteArray(4 * depth, ' '): "";
 
     //Double indentAmounts are purely for aesthetic purposes
@@ -133,7 +139,7 @@ QByteArray pattern_rule::toJson(int depth, bool indent){
     json += value_to_string();
     json += "\"\n";
     json += indentAmount+"}";
-    return json;
+    return json*/;
 }
 
 

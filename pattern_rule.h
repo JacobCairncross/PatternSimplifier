@@ -8,13 +8,13 @@
 class pattern_rule
 {
 public:
-  enum RuleType{pass, key, literalValue, index, size, contains};
+  enum RuleType{root, pass, key, literalValue, index, size, contains};
   pattern_rule(RuleType _ruleType);
   pattern_rule(RuleType _ruleType, QString _key);
   pattern_rule(RuleType _ruleType, QJsonValue _valueType, QString _stringVal);
   //TODO: Add more constructors
   RuleType rule_type();
-  QByteArray rule_name();
+  QString rule_name();
   QString key_value();
   //Value of literal can be string, signed int, unsigned int, float, bool
   QJsonValue value_type();
@@ -27,7 +27,7 @@ public:
   bool bool_value();
   int size_value();
   int index_value();
-  QByteArray value_to_string();
+  QString value_to_string();
 
   //Setters, maybe return bool to indicate success or fail?
   void set_key_value(QString value);
@@ -40,7 +40,7 @@ public:
   void set_bool_value(bool value);
   void set_size_value(int value);
   void set_index_value(int value);
-  QByteArray toJson(int depth = 0, bool indent = false);
+  QJsonObject* toJson();
 
 private:
   RuleType ruleType;

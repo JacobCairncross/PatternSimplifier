@@ -142,7 +142,7 @@ void MainWindow::on_selectNodeButton_clicked()
     QJsonValue jsonVal = ASTModel->genJson(selectedNodesRoot);
     save_byte_to_file(ASTModel->jsonToByte(jsonVal), "savedPattern.json");
 
-    save_byte_to_file(patternNodesRoot->toJson(1, true), "savedPatternItem.json");
+    save_byte_to_file(QJsonDocument(*patternNodesRoot->toJson()).toJson(), "savedPatternItem.json");
 }
 
 pattern_rule* make_rule_from_AST_item(QJsonTreeItem* item){
