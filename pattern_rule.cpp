@@ -94,6 +94,34 @@ QString pattern_rule::value_to_string(){
     }
 }
 
+QJsonValue pattern_rule::value_as_json(){
+    switch(ruleType){
+    case root:
+        return QJsonValue("");
+    case pass:
+        return QJsonValue("");
+    case key:
+        return QJsonValue(keyValue);
+    case literalValue:
+    {
+        if(valueType == QJsonValue::String){
+            return QJsonValue(stringValue);
+        }
+        else if(valueType == QJsonValue::Double){
+            return QJsonValue(floatValue);
+        }
+        else if(valueType == QJsonValue::Bool){
+            return QJsonValue(boolValue);
+        }
+    }
+        break;
+    case index:
+        return QJsonValue(indexValue);
+    case size:
+        return QJsonValue(sizeValue);
+    }
+}
+
 void pattern_rule::set_key_value(QString value){
   keyValue = value;
 }
@@ -125,7 +153,7 @@ void pattern_rule::set_index_value(int value){
 QJsonObject* pattern_rule::toJson(){
     QJsonObject* obj = new QJsonObject();
     obj->insert("rule", rule_name());
-    obj->insert("value", value_to_string());
+    obj->insert("value", value_as_json());
     return obj;
     /*QByteArray json;
     QByteArray indentAmount = indent ? QByteArray(4 * depth, ' '): "";

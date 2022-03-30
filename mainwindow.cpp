@@ -51,17 +51,7 @@ void MainWindow::on_actionSave_as_triggered()
     QString fileName = QFileDialog::getSaveFileName(this, "Save as");
     QByteArray byteText = ui->solidityCodeContainer->toPlainText().toUtf8();
     save_byte_to_file(byteText, fileName);
-//    QFile file(fileName);
-//    if(!file.open(QFile::WriteOnly | QFile::Text)){
-//        QMessageBox::warning(this, "Warning", "Cannot save file : " + file.errorString());
-//        return;
-//    }
-//    currentFile = fileName;
-//    setWindowTitle(fileName);
-//    QTextStream out(&file);
-//    QString text = ui->solidityCodeContainer->toPlainText();
-//    out << text;
-//    file.close();
+
 }
 
 void MainWindow::save_byte_to_file(QByteArray byteArr, QString fileName){
@@ -74,17 +64,6 @@ void MainWindow::save_byte_to_file(QByteArray byteArr, QString fileName){
 
 void MainWindow::on_actionCompile_triggered()
 {
-    //Original way of making tree
-//    SolidityHandler* solidityHandler = new SolidityHandler();
-//    solidityHandler->sol_to_solast(currentFile);
-
-//    QJsonObject ast = solidityHandler->get_ast();
-//    QStringList keys = ast.keys();
-//    for(int i=0;i<keys.length();i++){
-//        QString currentKey = keys.at(i);
-//        AddRoot(currentKey, ast.value(keys.at(i)));
-//    }
-
     //Using QJsonTree library
     ASTModel = new QJsonModel;
     ui->newSolASTContainer->setModel(ASTModel);
@@ -131,16 +110,15 @@ void MainWindow::on_selectNodeButton_clicked()
         assert(lastNode == newNode->parent());
         lastNode->appendChild(newNode);
         PatternTreeItem* newItem = new PatternTreeItem(make_rule_from_AST_item(pathToRoot[i]), lastNode->correspondingPatternItem());
+        //Check if item is literal, if so add a new child rule to match exactly that literal
+        if(pathToRoot[i]->type() != QJsonValue::Type::Object && pathToRoot[i]->type() != QJsonValue::Type::Array){
+            PatternTreeItem* literalRule = new PatternTreeItem(make_rule(pattern_rule::RuleType::literalValue, QJsonValue::fromVariant(pathToRoot[i]->value())), newItem);
+            newItem->appendChild(literalRule);
+        }
         lastNode->correspondingPatternItem()->appendChild(newItem);
         newNode->setCorrespondingPatternItem(newItem);
         lastNode = newNode;
-        //See if you can get this to print to a file
     }
-
-
-
-    QJsonValue jsonVal = ASTModel->genJson(selectedNodesRoot);
-    save_byte_to_file(ASTModel->jsonToByte(jsonVal), "savedPattern.json");
 
     save_byte_to_file(QJsonDocument(*patternNodesRoot->toJson()).toJson(), "savedPatternItem.json");
 }
@@ -148,17 +126,21 @@ void MainWindow::on_selectNodeButton_clicked()
 pattern_rule* make_rule_from_AST_item(QJsonTreeItem* item){
     pattern_rule::RuleType ruleType;
     QJsonValue value;
-    if(item->type() == QJsonValue::Type::Object){
+    QJsonTreeItem* parent = item->parent();
+    if(parent->type() == QJsonValue::Type::Object){
         ruleType = pattern_rule::RuleType::key;
         value = item->key();
     }
-    else if(item->type() == QJsonValue::Type::Array){
-        ruleType = pattern_rule::RuleType::size;
-        value = item->childCount();
-    }
-    else{
-        ruleType = pattern_rule::RuleType::literalValue;
-        value = QJsonValue::fromVariant(item->value());
+    else if(parent->type() == QJsonValue::Type::Array){
+        ruleType = pattern_rule::RuleType::index;
+        //Default value is final index in array although this should always be changed to the actual index of the item
+        value = parent->childCount();
+        //Find what index item is in parent array
+        for(int i = 0; i< parent->childCount();i++){
+            if(parent->child(i) == item){
+                value = i;
+            }
+        }
     }
 
     return make_rule(ruleType, value);
@@ -233,8 +215,4 @@ void make_literal_rule(pattern_rule* rule, QJsonValue value){
         break;
     }
     }
-}
-
-void addPatternItemToTree(PatternTreeItem* item){
-
 }

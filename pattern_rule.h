@@ -28,6 +28,7 @@ public:
   int size_value();
   int index_value();
   QString value_to_string();
+  QJsonValue value_as_json();
 
   //Setters, maybe return bool to indicate success or fail?
   void set_key_value(QString value);
