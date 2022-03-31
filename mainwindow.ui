@@ -14,36 +14,84 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="horizontalLayoutWidget">
+   <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>-1</x>
-      <y>0</y>
-      <width>1821</width>
+      <x>60</x>
+      <y>50</y>
+      <width>1921</width>
       <height>741</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QTextEdit" name="solidityCodeContainer"/>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTextEdit" name="solidityCodeContainer"/>
+       </item>
+       <item>
+        <widget class="QTreeView" name="newSolASTContainer"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4"/>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QTreeView" name="newSolASTContainer"/>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QPushButton" name="selectNodeButton">
+         <property name="text">
+          <string>Select Node</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="valueBox"/>
+       </item>
+       <item>
+        <widget class="QComboBox" name="typeBox">
+         <item>
+          <property name="text">
+           <string>string</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>int</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>float</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>bool</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="changeValueButton">
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Change Rule Value</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
-   </widget>
-   <widget class="QPushButton" name="selectNodeButton">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>750</y>
-      <width>89</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Select Node</string>
-    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

@@ -36,6 +36,8 @@ private slots:
 
     void save_byte_to_file(QByteArray byteArr, QString fileName);
 
+    void on_changeValueButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString currentFile = "";

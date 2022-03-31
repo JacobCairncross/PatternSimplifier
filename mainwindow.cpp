@@ -142,8 +142,8 @@ pattern_rule* make_rule_from_AST_item(QJsonTreeItem* item){
             }
         }
     }
-
-    return make_rule(ruleType, value);
+    return new pattern_rule(ruleType, value);
+//    return make_rule(ruleType, value);
 }
 
 pattern_rule* make_rule(pattern_rule::RuleType ruleType, QJsonValue value){
@@ -216,3 +216,17 @@ void make_literal_rule(pattern_rule* rule, QJsonValue value){
     }
     }
 }
+
+void MainWindow::on_changeValueButton_clicked()
+{
+//    QModelIndex index = ui->newSolASTContainer->currentIndex();
+//    QJsonTreeItem* data = ASTModel->treeData(index);
+//    if(ui->typeBox->currentText() == "int"){
+//        bool isInt = false;
+//        int intValue = ui->valueBox->text().toInt(&isInt);
+//        if(isInt){
+//            data->correspondingPatternItem()->rule()->set
+//        }
+//    }
+}
+

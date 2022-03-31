@@ -3,6 +3,10 @@
 pattern_rule::pattern_rule(RuleType _ruleType){
   ruleType = _ruleType;
 }
+pattern_rule::pattern_rule(RuleType _ruleType, QJsonValue _value){
+    ruleType = _ruleType;
+    value = _value;
+}
 pattern_rule::pattern_rule(RuleType _ruleType, QString _key){
   ruleType = _ruleType;
   keyValue = _key;
@@ -66,6 +70,11 @@ int pattern_rule::size_value(){
 int pattern_rule::index_value(){
   return indexValue;
 }
+
+QJsonValue pattern_rule::get_value(){
+    return value;
+}
+
 QString pattern_rule::value_to_string(){
     switch(ruleType){
     case root:
@@ -149,27 +158,16 @@ void pattern_rule::set_size_value(int value){
 void pattern_rule::set_index_value(int value){
   indexValue = value;
 }
+void pattern_rule::set_value(QJsonValue _value){
+    value = _value;
+}
 
 QJsonObject* pattern_rule::toJson(){
     QJsonObject* obj = new QJsonObject();
     obj->insert("rule", rule_name());
-    obj->insert("value", value_as_json());
+    obj->insert("value", value);
     return obj;
-    /*QByteArray json;
-    QByteArray indentAmount = indent ? QByteArray(4 * depth, ' '): "";
 
-    //Double indentAmounts are purely for aesthetic purposes
-    json += indentAmount+"{\n";
-    json += indentAmount+"\"rule\": ";
-    json += '"';
-    json += rule_name();
-    json += "\",\n";
-    json += indentAmount+"\"value\": ";
-    json += '"';
-    json += value_to_string();
-    json += "\"\n";
-    json += indentAmount+"}";
-    return json*/;
 }
 
 
