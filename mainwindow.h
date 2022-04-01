@@ -38,6 +38,10 @@ private slots:
 
     void on_changeValueButton_clicked();
 
+    void change_rule_value(PatternTreeItem* item);
+
+    void change_rule_type(PatternTreeItem* selectedNode);
+
 private:
     Ui::MainWindow *ui;
     QString currentFile = "";

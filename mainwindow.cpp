@@ -95,7 +95,7 @@ void MainWindow::on_selectNodeButton_clicked()
     //Find common ancestor so we can append new path to it
     QJsonTreeItem* mostCommonAncestor = selectedNodesRoot;
     int pathToRootIndex = pathToRoot.length()-2;
-    while(mostCommonAncestor->hasChild(pathToRoot[pathToRootIndex]->key())){
+    while(pathToRootIndex >= 0 && mostCommonAncestor->hasChild(pathToRoot[pathToRootIndex]->key())){
         mostCommonAncestor = mostCommonAncestor->child(pathToRoot[pathToRootIndex]->key());
         pathToRootIndex--;
     }
@@ -112,7 +112,7 @@ void MainWindow::on_selectNodeButton_clicked()
         PatternTreeItem* newItem = new PatternTreeItem(make_rule_from_AST_item(pathToRoot[i]), lastNode->correspondingPatternItem());
         //Check if item is literal, if so add a new child rule to match exactly that literal
         if(pathToRoot[i]->type() != QJsonValue::Type::Object && pathToRoot[i]->type() != QJsonValue::Type::Array){
-            PatternTreeItem* literalRule = new PatternTreeItem(make_rule(pattern_rule::RuleType::literalValue, QJsonValue::fromVariant(pathToRoot[i]->value())), newItem);
+            PatternTreeItem* literalRule = new PatternTreeItem(new pattern_rule(pattern_rule::RuleType::literalValue, QJsonValue::fromVariant(pathToRoot[i]->value())), newItem);
             newItem->appendChild(literalRule);
         }
         lastNode->correspondingPatternItem()->appendChild(newItem);
@@ -120,7 +120,13 @@ void MainWindow::on_selectNodeButton_clicked()
         lastNode = newNode;
     }
 
-    save_byte_to_file(QJsonDocument(*patternNodesRoot->toJson()).toJson(), "savedPatternItem.json");
+    QByteArray jsonByteArray = QJsonDocument(*patternNodesRoot->toJson()).toJson();
+    save_byte_to_file(jsonByteArray, "savedPatternItem.json");
+    QAbstractItemModel* model = ui->patternContainer->model();
+    ASTModel = new QJsonModel;
+    ui->patternContainer->setModel(ASTModel);
+    ASTModel->loadJson(jsonByteArray);
+    delete model;
 }
 
 pattern_rule* make_rule_from_AST_item(QJsonTreeItem* item){
@@ -143,90 +149,100 @@ pattern_rule* make_rule_from_AST_item(QJsonTreeItem* item){
         }
     }
     return new pattern_rule(ruleType, value);
-//    return make_rule(ruleType, value);
 }
 
-pattern_rule* make_rule(pattern_rule::RuleType ruleType, QJsonValue value){
-    pattern_rule* rule = new pattern_rule(ruleType);
-    //Got to make a parameter to store values for the different rules. E.g a parameter to fill in key value, index value, string value, etc
-    //maybe make separate functions for all scenarios. Contains value has to have a value of any type so maybe leave that for a bit and do the others first.
-    //Implement contains but only for primitives for now
-    bool errorOccurred = false;
-    switch(ruleType){
-    case pattern_rule::RuleType::key:
-    {
-        if(value.isString()){
-            rule->set_key_value(value.toString());
-        }
-        else{
-            errorOccurred = true;
-        }
-        break;
-    }
-    case pattern_rule::RuleType::index:
-    {
-        if(value.isDouble()){
-            //Just truncates if not an actual int. Possibly add error later if not a strict int
-            rule->set_index_value((int)value.toDouble());
-        }
-        else{
-            errorOccurred = true;
-        }
-        break;
-    }
-    case pattern_rule::RuleType::size:
-    {
-        if(value.isDouble()){
-            //Just truncates if not an actual int. Possibly add error later if not a strict int
-            rule->set_size_value((int)value.toDouble());
-        }
-        else{
-            errorOccurred = true;
-        }
-        break;
-    }
-    case pattern_rule::RuleType::literalValue:
-    {
-        make_literal_rule(rule, value);
-    }
-    }
-    return rule;
-}
 
-void make_literal_rule(pattern_rule* rule, QJsonValue value){
-    switch(value.type()){
-    case QJsonValue::Type::String:
-    {
-        rule->set_value_type(QJsonValue::Type::String);
-        rule->set_string_value(value.toString());
-        break;
-    }
-    case QJsonValue::Type::Double:
-    {
-        //Value type will always say double so int will never be used. This may cause issues when using nlohmann. For now just treat everything as double
-        rule->set_value_type(QJsonValue::Type::Double);
-        rule->set_float_value(value.toDouble());
-        break;
-    }
-    case QJsonValue::Type::Bool:
-    {
-        rule->set_value_type(QJsonValue::Type::Bool);
-        rule->set_float_value(value.toBool());
-        break;
-    }
-    }
-}
+
 
 void MainWindow::on_changeValueButton_clicked()
 {
-//    QModelIndex index = ui->newSolASTContainer->currentIndex();
-//    QJsonTreeItem* data = ASTModel->treeData(index);
-//    if(ui->typeBox->currentText() == "int"){
-//        bool isInt = false;
-//        int intValue = ui->valueBox->text().toInt(&isInt);
-//        if(isInt){
-//            data->correspondingPatternItem()->rule()->set
-//        }
-//    }
+    QModelIndex index = ui->newSolASTContainer->currentIndex();
+    QJsonTreeItem* data = ASTModel->treeData(index);
+    QList<QJsonTreeItem*> pathToRoot = QList<QJsonTreeItem*>();
+    QJsonTreeItem* currentNode = data;
+
+    //Data isnt the actual node in selected nodes so we need to traverse the selected nodes to find it
+    while(currentNode != nullptr){
+        pathToRoot.append(currentNode);
+        currentNode = currentNode->parent();
+    }
+    QJsonTreeItem* selectedNode = selectedNodesRoot;
+    int pathToRootIndex = pathToRoot.length()-2;
+    while(pathToRootIndex >= 0 && selectedNode->hasChild(pathToRoot[pathToRootIndex]->key())){
+        selectedNode = selectedNode->child(pathToRoot[pathToRootIndex]->key());
+        pathToRootIndex--;
+    }
+    PatternTreeItem* item = selectedNode->correspondingPatternItem();
+    if(index.column() == 1 && selectedNode->value().isValid()){
+        //If they select the second column AND the child is a literal value (if its value is valid then its a leaf literal) rule then select the child node
+        item = item->child(0);
+    }
+    if(ui->ruleBox->currentText() == "Rule Type"){
+        change_rule_type(item);
+    }
+    else if(ui->ruleBox->currentText() == "Rule Value"){
+        change_rule_value(item);
+    }
+
+
+    QByteArray jsonByteArray = QJsonDocument(*patternNodesRoot->toJson()).toJson();
+    save_byte_to_file(jsonByteArray, "savedPatternItem.json");
+    QAbstractItemModel* model = ui->patternContainer->model();
+    ASTModel = new QJsonModel;
+    ui->patternContainer->setModel(ASTModel);
+    ASTModel->loadJson(jsonByteArray);
+    delete model;
+
 }
 
+void MainWindow::change_rule_type(PatternTreeItem* item){
+    if(ui->valueBox->text().toLower() == "pass"){
+        item->rule()->set_rule(pattern_rule::RuleType::pass);
+    }
+    else if(ui->valueBox->text().toLower() == "key"){
+        item->rule()->set_rule(pattern_rule::RuleType::key);
+    }
+    else if(ui->valueBox->text().toLower() == "index"){
+        item->rule()->set_rule(pattern_rule::RuleType::index);
+    }
+    else if(ui->valueBox->text().toLower() == "size"){
+        item->rule()->set_rule(pattern_rule::RuleType::size);
+    }
+    else if(ui->valueBox->text().toLower() == "contains"){
+        item->rule()->set_rule(pattern_rule::RuleType::contains);
+    }
+    else if(ui->valueBox->text().toLower() == "literal_value"){
+        item->child(0)->rule()->set_rule(pattern_rule::RuleType::literalValue);
+    }
+}
+
+void MainWindow::change_rule_value(PatternTreeItem* item){
+    if(ui->typeBox->currentText() == "int"){
+        bool isInt = false;
+        int intValue = ui->valueBox->text().toInt(&isInt);
+        if(isInt){
+            item->rule()->set_value(QJsonValue(intValue));
+        }
+        //Handle error here
+    }
+    else if(ui->typeBox->currentText() == "float"){
+        bool isFloat = false;
+        float floatValue = ui->valueBox->text().toFloat(&isFloat);
+        if(isFloat){
+            item->rule()->set_value(QJsonValue(floatValue));
+        }
+        //Handle error here
+    }
+    else if(ui->typeBox->currentText() == "bool"){
+        if(ui->valueBox->text().toLower() == "true"){
+            item->rule()->set_value(QJsonValue(true));
+        }
+        else if(ui->valueBox->text().toLower() == "false"){
+            item->rule()->set_value(QJsonValue(false));
+        }
+        //Handle error here
+    }
+    else{
+        item->rule()->set_value(QJsonValue(ui->valueBox->text()));
+    }
+}

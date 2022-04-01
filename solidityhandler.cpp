@@ -14,7 +14,8 @@ QByteArray SolidityHandler::get_ast(){
 
     QTextStream in(&file);
     QString text = in.readAll();
-    text.remove(0,55);
+    int startIndex = text.indexOf("{");
+    text.remove(0,startIndex);
 
     return text.toUtf8();
 }
